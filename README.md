@@ -25,7 +25,7 @@ Run the commands in the script to setup the base things
 These will get installed.
 Lets get it exposed and get password.
 
-```
+```sh
 # Get the password
 kubectl -n default get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 U83v6fC9oIARO68L
@@ -33,3 +33,22 @@ U83v6fC9oIARO68L
 kubectl port-forward service/my-argo-cd-argocd-server -n default 8080:80 --address 0.0.0.0
 ```
 
+## Setup the ArgoCD Application
+
+You can find all the argo-cd Application manifest under ``argo_cd_apps`` folder
+
+```sh
+kubectl apply -f grafana.yaml
+kubectl apply -f test_app.yaml
+```
+
+You might want to update the ``test_app.yaml`` file to point to your own github repo.
+Once deployed everything, expose the grafana and get admin password
+```sh
+kubectl get secret grafana -o jsonpath={.data.admin-password} | base64 -d
+kubectl -n grafana port-forward --address 0.0.0.0 svc/grafana 8081:80
+```
+QT3xKdvJss4QoFEwTQuERzOTbU1g0msH3p4E7hoC
+
+
+Now lets setup loki and alloy
