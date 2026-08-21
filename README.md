@@ -1,1 +1,35 @@
 # Deploy Log Monitoring in K8S
+
+## Setup EC2 instance
+
+```sh
+aws ec2 run-instances --image-id 'ami-0b6d9d3d33ba97d99' --instance-type 't2.large' --no-ebs-optimized --block-device-mappings '{"DeviceName":"/dev/sda1","Ebs":{"Encrypted":false,"DeleteOnTermination":true,"Iops":3000,"SnapshotId":"snap-0ffe259ee34f7697a","VolumeSize":30,"VolumeType":"gp3","Throughput":125}}' --network-interfaces '{"AssociatePublicIpAddress":true,"DeviceIndex":0,"Groups":["sg-081806af9eb6e3482"]}' --credit-specification '{"CpuCredits":"standard"}' --tag-specifications '{"ResourceType":"instance","Tags":[{"Key":"Name","Value":"log-monitoring"}]}' --iam-instance-profile '{"Arn":"arn:aws:iam::272577611462:instance-profile/my-ssm-role"}' --instance-market-options '{"MarketType":"spot"}' --metadata-options '{"HttpEndpoint":"enabled","HttpPutResponseHopLimit":2,"HttpTokens":"required"}' --private-dns-name-options '{"HostnameType":"ip-name","EnableResourceNameDnsARecord":true,"EnableResourceNameDnsAAAARecord":false}' --count '1' 
+```
+
+This creates a spot instance with ubuntu OS. I have selected by one SG you may have to update it based on your needs.
+
+
+## Setup the Minikube with Argo-CD
+
+
+```sh
+01_k8s_setup.sh
+```
+
+Run the commands in the script to setup the base things
+
+- Docker
+- Minikube
+- Argo-CD
+
+These will get installed.
+Lets get it exposed and get password.
+
+```
+# Get the password
+kubectl -n default get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+U83v6fC9oIARO68L
+# Expose the service to outside world
+kubectl port-forward service/my-argo-cd-argocd-server -n default 8080:80 --address 0.0.0.0
+```
+
