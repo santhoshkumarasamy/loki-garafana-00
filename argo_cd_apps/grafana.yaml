@@ -1,17 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-app
+  name: grafana
   namespace: default
 spec:
   destination:
-    namespace: nginx-test
+    namespace: grafana
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: test_app
-    repoURL: https://github.com/santhoshkumarasamy/loki-garafana-00
-    targetRevision: main
+    chart: grafana
+    helm:
+      parameters:
+      - name: namespaceOverride
+        value: grafana
+    repoURL: https://grafana-community.github.io/helm-charts
+    targetRevision: 12.11.1
   syncPolicy:
     automated:
       enabled: true
