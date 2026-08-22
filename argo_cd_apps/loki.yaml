@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: default
+spec:
+  destination:
+    namespace: loki
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: loki
+    helm:
+      parameters:
+      - name: loki.auth_enabled
+        value: "false"
+      - name: loki.storage.type
+        value: filesystem
+      - name: backend.replicas
+        value: "0"
+      - name: read.replicas
+        value: "0"
+      - name: write.replicas
+        value: "0"
+      - name: singleBinary.replicas
+        value: "1"
+      - name: loki.useTestSchema
+        value: "true"
+    repoURL: https://grafana-community.github.io/helm-charts/
+    targetRevision: 18.11.0
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: false
+      selfHeal: false
+    syncOptions:
+    - CreateNamespace=true
